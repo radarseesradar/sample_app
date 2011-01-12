@@ -52,6 +52,24 @@ describe UsersController do
         response.should have_selector("a", :href => "/users?page=2",
                                            :content => "Next")
       end
+      
+      it "should not allow non-admin to delete any user" do
+        get :index
+        response.should_not have_selector("a", :content => "delete" )
+      end
+      
+      it "should not allow admin to delete himself" do
+        @user.toggle!( :admin )
+        get :index
+        response.should_not have_selector("a", :href => user_path(@user),
+                                               :content => "delete")
+      end
+      
+      it "should allow admin to delete anybody but himself" do
+        @user.toggle!( :admin )
+        get :index
+        response.should have_selector("a", :content => "delete" )
+      end
 
     end
 
